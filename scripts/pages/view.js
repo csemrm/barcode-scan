@@ -11,14 +11,19 @@ const File = require('sf-core/io/file');
 const HeaderBarItem = require('sf-core/ui/headerbaritem');
 const TextAlignment = require('sf-core/ui/textalignment');
 const Font = require('sf-core/ui/font');
-
-
+const Router = require("sf-core/ui/router");
 const database = new Database({
             file: new File({path: Path.DataDirectory + '/barcode.sqlite'})
         });
-        
+database.execute("DROP TABLE basic_info");
+database.execute("CREATE TABLE IF NOT EXISTS basic_info ( 'id' INTEGER AUTOINCREMENT, 'name' TEXT ,'serialNo' TEXT , 'yearOfMaking' TEXT, 'model' TEXT, 'location' TEXT , PRIMARY KEY('id') )");
+database.execute("INSERT INTO basic_info (name,serialNo, yearOfMaking, model, location) VALUES ('lorem1','001', '2017', 'test001', 'Savar')");
+database.execute("INSERT INTO basic_info (name,serialNo, yearOfMaking, model, location) VALUES ('lorem2','002', '2017', 'test002', 'dhaka')");
+database.execute("INSERT INTO basic_info (name,serialNo, yearOfMaking, model, location) VALUES ('lorem3','003', '2017', 'test003', 'Comilla')");
+database.execute("INSERT INTO basic_info (name,serialNo, yearOfMaking, model, location) VALUES ('lorem1','001', '2017', 'test004', 'Feni')");
+database.execute("INSERT INTO basic_info (name,serialNo, yearOfMaking, model, location) VALUES ('lorem2','002', '2017', 'test005', 'Begerhat')");
+database.execute("INSERT INTO basic_info (name,serialNo, yearOfMaking, model, location) VALUES ('lorem3','003', '2017', 'test006', 'Narshingdi')");
 
-database.execute("CREATE TABLE IF NOT EXISTS basic_info ( 'id' INTEGER, 'name' TEXT ,'serialNo' TEXT , 'yearOfMaking' TEXT, 'model' TEXT, 'location' TEXT , PRIMARY KEY('id') )");
     
 
 const Page_ = extend(Page)(
@@ -31,11 +36,11 @@ const Page_ = extend(Page)(
 			onLoad: onLoad.bind(this)
 		});
 });
-
+//https://github.com/csemrm/barcode-scan
 // Page.onShow -> This event is called when a page appears on the screen (everytime).
 function onShow() {
     this.headerBar.visible = true;
-    this.headerBar.title = "view";
+    this.headerBar.title = "List";
     this.headerBar.titleColor = Color.create("#000000");
     this.headerBar.backgroundColor = Color.create("#FFFFFF");
     this.statusBar.visible = true;
@@ -46,15 +51,15 @@ function onShow() {
 function onLoad() {
     const page = this;
     var myItem = new HeaderBarItem({
-        title: "Done",
+        title: "Reload",
         onPress: function() {
-                    alert("You pressed Done item!");
+                    Router.go("view");
                 }
                 });
     this.headerBar.setItems([myItem]);
 
     var leftItem = new HeaderBarItem({
-        title : "Left Item",
+        title : "Add",
         onPress: function() {
                     alert("You pressed Done item!");
                 }
@@ -63,7 +68,7 @@ function onLoad() {
 
     var queryResult = database.query("SELECT * FROM basic_info WHERE 1");
     var myDataSet = [];
-    console.log('queryResult ' + queryResult.count() );
+    //console.log('queryResult ' + queryResult.count() );
     for(var i = 0; i < queryResult.count() ; i++){
     // Getting person
     var basic_info = queryResult.get(i);
@@ -73,17 +78,19 @@ function onLoad() {
         serialNo: basic_info.getString('serialNo'), 
         yearOfMaking: basic_info.getString('yearOfMaking'), 
         model: basic_info.getString('model'), 
-        location: basic_info.getString('location'), 
+        location: basic_info.getString('location'),
+        id: basic_info.getString('id'),
     } );
 }
- console.log(JSON.stringify(myDataSet));
-    database.close( );
+ console.log('data is'+JSON.stringify(myDataSet));
+database.close( );
     
 
 var myListView = new ListView({
     flexGrow:1,
-    rowHeight: 60,
-    backgroundColor: Color.LIGHTGRAY,
+    rowHeight: 70,
+//    rowHeight: 60,
+    backgroundColor: Color.WHITE,
     itemCount: myDataSet.length,
     justifyContent: FlexLayout.JustifyContent.SPACE_BETWEEN
 });

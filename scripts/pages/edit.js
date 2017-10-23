@@ -8,18 +8,14 @@ const Label = require('sf-core/ui/label');
 const TextBox = require('sf-core/ui/textbox');
 const Button = require('sf-core/ui/button');
 const Router = require("sf-core/ui/router");
+const System = require('sf-core/device/system');
 const Font = require('sf-core/ui/font');
 const ImageView = require('sf-core/ui/imageview');
 const ScrollView = require('sf-core/ui/scrollview');
 const database = require('../model/database');
-const System = require('sf-core/device/system');
-console.log("Device.System.OS: "+ System.OS);
-
-var serialNo;
+var idData;
 
 
-
-var myDataSet = [];
 
 const Page_ = extend(Page)(
     // Constructor
@@ -30,143 +26,70 @@ const Page_ = extend(Page)(
             onLoad: onLoad.bind(this)
         });
     });
-//https://github.com/csemrm/barcode-scan
-// Page.onShow -> This event is called when a page appears on the screen (everytime).
-function onShow(data) {
-    
-    const page = this;
-    serialNo = JSON.stringify(data);
-    page.serialNo.text = serialNo;
-    
-    if(System.OS =='Android'){
-        
-        //alert('ddd');
-        this.headerBar.visible = false;
-        this.headerBar.title = "";
-        this.statusBar.android && (this.statusBar.android.color = Color.create("#00A1F1"));
-       
-        
-    }else{
-    this.headerBar.visible = true;
-    this.headerBar.title = "Asset Entry";
-    this.headerBar.titleColor = Color.create("#000000");
-    this.headerBar.backgroundColor = Color.create("#FFFFFF");
-    this.statusBar.visible = true;
-    
-    }
-    
-    page.addButton.onPress = function() {
 
-        if (page.name.text == '') {
-            alert('Please enter name');
-        }else if (page.serialNo.text == '') {
-            alert('Please enter serial No');
-        }else if (page.model.text == '') {
-            alert('Please enter model No');
-        }else if (page.yearOfMaking.text == '') {
-            alert('Please enter year Of making field ');
-        }else if (page.location12.text == '') {
-            alert('Please enter location No');
-        }else {
-
-            var cmd = ("INSERT INTO basic_info (name,serialNo, yearOfMaking, model, location) VALUES( '" + page.name.text + "' , '" + page.serialNo.text + "','" + page.yearOfMaking.text + "', '" + page.model.text + "','" + page.location12.text + "')");
-            var result = database.editData(cmd);
-            console.log("result  " + JSON.stringify(result));
-            Router.go("list");
-        }
-    }
-    
-   
-}
 
 // Page.onLoad -> This event is called once when page is created.
 function onLoad() {
     const page = this;
-   
-    
-     if (System.OS =='Android'){
-  
+    if (System.OS == 'Android') {
+
         var myFlexLayout = new FlexLayout({
-            flexGrow:1,
-            width:400,
-            height:50,
+            flexGrow: 1,
+            width: 400,
+            height: 50,
             //backgroundColor:Color.RED,
             top: 0,
             left: 0,
             bottom: 0,
             right: 0,
-            borderColor:Color.GRAY,
-            borderWidth:1,
+            borderColor: Color.GRAY,
+            borderWidth: 1,
             positionType: FlexLayout.PositionType.ABSOLUTE,
             flexDirection: FlexLayout.FlexDirection.ROW,
-            textAlignment:TextAlignment.MIDCENTER
-            
+            textAlignment: TextAlignment.MIDCENTER
+
         });
         page.layout.addChild(myFlexLayout);
-        
+
         //this.layout.flexDirection = FlexLayout.FlexDirection.ROW;
-        
-        /*
-        
-        var addButton =  new Label({
-            marginTop: 5,
-            marginLeft: 10,
-            bottom: 0,
-            width: 50,
-            textColor:Color.create("#5277e5"),
-            alignSelf: FlexLayout.AlignSelf.AUTO,
-            font: Font.create("Arial", 15, Font.BOLD),
-            text: "Back",
+
+        var myImageView = new ImageView({
+            // image: myImage,
+            left: 0,
+            width: 48,
+            height: 48,
+            imageFillType: ImageView.FillType.ASPECTFIT,
             onTouch: function() {
                 Router.go("list");
-           }
+            }
+        });
 
-    });
-    
-    addButton.backgroundColor = Color.WHITE;
-    myFlexLayout.addChild(addButton);
-    
-    */
-    
-    
-    var myImageView = new ImageView({
-       // image: myImage,
-        left: 0,
-        width:48,
-        height:48,
-        imageFillType: ImageView.FillType.ASPECTFIT,
-        onTouch: function() {
-                Router.go("scan");
-           }
-    });
-    
-    myImageView.loadFromUrl(
-        "https://cdn4.iconfinder.com/data/icons/evil-icons-user-interface/64/arrow_left2-48.png"
-    );
-  myFlexLayout.addChild(myImageView);
+        myImageView.loadFromUrl(
+            "https://cdn4.iconfinder.com/data/icons/evil-icons-user-interface/64/arrow_left2-48.png"
+        );
+        myFlexLayout.addChild(myImageView);
 
-    
-    var myLabel = new Label({
-        text: "Asset Entry",
-        visible: true,
-        marginTop: 5,
-        width: 100,
-        height: 40,
-        textColor:Color.BLACK,
-        marginLeft: 80,
-        textAlignment:TextAlignment.MIDCENTER,
-        
-       });
+
+        var myLabel = new Label({
+            text: "Edit Asset",
+            visible: true,
+            marginTop: 5,
+            width: 100,
+            height: 40,
+            textColor: Color.BLACK,
+            marginLeft: 80,
+            textAlignment: TextAlignment.MIDCENTER,
+
+        });
         myLabel.font = Font.create("Arial", 15, Font.BOLD);
         myFlexLayout.addChild(myLabel);
-   
+
     }
-    
     this.layout.flexDirection = FlexLayout.FlexDirection.ROW;
     this.layout.justifyContent = FlexLayout.JustifyContent.CENTER;
     this.layout.alignItems = FlexLayout.AlignItems.CENTER;
-    
-    
+
+
     var scrollView = new ScrollView({
         top: 0,
         bottom: 0,
@@ -197,7 +120,7 @@ function onLoad() {
         marginTop: 20,
         width: 300,
         height: 65,
-        hint: "Name",
+        hint: "name",
         borderWidth: 1,
         //text: 'ariful',
         alignSelf: FlexLayout.AlignSelf.CENTER,
@@ -220,6 +143,7 @@ function onLoad() {
     });
 
     serialtitle.font = Font.create("Arial", 16, Font.BOLD);
+
     scrollView.layout.addChild(serialtitle);
 
     var serialNo = new TextBox({
@@ -230,7 +154,6 @@ function onLoad() {
         height: 65,
         hint: "Serial No",
         borderWidth: 1,
-        //text:page.serialNo.text ,
         //text: 'ariful',
         alignSelf: FlexLayout.AlignSelf.CENTER,
         borderColor: Color.create("#F0F0F0"),
@@ -336,7 +259,7 @@ function onLoad() {
 
     scrollView.layout.addChild(location12);
 
-    var addButton = new Button({
+    var editButton = new Button({
         marginTop: 20,
         bottom: 0,
         width: 250,
@@ -348,18 +271,87 @@ function onLoad() {
             pressed: Color.CYAN
         },
         font: Font.create("Arial", 20, Font.BOLD),
-        text: "Add",
+        text: "Edit",
+        onPress: function() {
+
+
+            var nameToUpdate = page.name.text;
+            var serialNo = page.serialNo.text;
+            var modelToUpdate = page.model.text;
+            var locationToUpdate = page.location12.text;
+            var yearOfMaking = page.yearOfMaking.text;
+
+            if (nameToUpdate == '') {
+                alert('Please enter name');
+            }
+            else if (serialNo == '') {
+                alert('Please enter serial No');
+            }
+            else if (modelToUpdate == '') {
+                alert('Please enter model No');
+            }
+            else if (yearOfMaking == '') {
+                alert('Please enter year of making');
+            }
+            else if (yearOfMaking == '') {
+                alert('Please enter location No');
+            }
+            else {
+                var cmd = "UPDATE basic_info SET 'name' = '" + nameToUpdate + "' , 'serialNo' = '" + serialNo + "', 'yearOfMaking' ='" + yearOfMaking + "', 'location' = '" + locationToUpdate + "' where id= " + idData;
+                var result = database.editData(cmd);
+                console.log("result  " + JSON.stringify(result));
+                Router.go("list");
+            }
+        }
 
     });
 
-    scrollView.layout.addChild(addButton);
+    scrollView.layout.addChild(editButton);
     page.name = name;
     page.serialNo = serialNo;
     page.yearOfMaking = yearOfMaking;
     page.model = model;
     page.location12 = location12;
-    page.addButton = addButton;
+
+
+
+
 
 }
+
+// Page.onShow -> This event is called when a page appears on the screen (everytime).
+function onShow(data) {
+    const page = this;
+    console.log('onShow' + JSON.stringify(data));
+    //name = data.title;
+    page.name.text = data.title;
+    page.serialNo.text = data.serialNo;
+    page.yearOfMaking.text = data.yearOfMaking;
+    page.model.text = data.model;
+    page.location12.text = data.location;
+    idData = data.id;
+
+    console.log('idData' + data.id);
+    if (System.OS == 'Android') {
+
+        //alert('ddd');
+        this.headerBar.visible = false;
+        this.headerBar.title = "";
+        this.statusBar.android && (this.statusBar.android.color = Color.create("#00A1F1"));
+
+
+    }
+    else {
+        this.headerBar.visible = true;
+        this.headerBar.title = "Edit Asset";
+        this.headerBar.titleColor = Color.create("#000000");
+        this.headerBar.backgroundColor = Color.create("#FFFFFF");
+        this.statusBar.visible = true;
+
+    }
+
+}
+
+
 
 module && (module.exports = Page_);
