@@ -21,6 +21,7 @@ console.log("Device.System.OS: " + System.OS);
 
 
 var myDataSet = [];
+var myListView;
 const Page_ = extend(Page)(
     // Constructor
     function(_super) {
@@ -35,7 +36,11 @@ const Page_ = extend(Page)(
 // Page.onShow -> This event is called when a page appears on the screen (everytime).
 function onShow() {
 
-    var page = this;
+    const page = this;
+     myDataSet = database.list();
+     myListView.itemCount = myDataSet.length;
+     myListView.refreshData();
+     myListView.stopRefresh();
 
     if (System.OS == 'Android') {
         this.headerBar.visible = false;
@@ -78,37 +83,34 @@ function onShow() {
         myAlertView.show();
     }
     
+  
     
-    
-        
-
-
 }
 
 // Page.onLoad -> This event is called once when page is created.
 function onLoad() {
     const page = this;
+    
+    if (System.OS == 'iOS') {
+      var myItem = new HeaderBarItem({
+          title: "Reload",
+          onPress: function() {
+              myDataSet = database.list();
+              myListView.itemCount = myDataSet.length;
+              myListView.refreshData();
+              myListView.stopRefresh();
+          }
+      });
+      this.headerBar.setItems([myItem]);
 
-
-    var myItem = new HeaderBarItem({
-        title: "Reload",
-        onPress: function() {
-            myDataSet = database.list();
-            myListView.itemCount = myDataSet.length;
-            myListView.refreshData();
-            myListView.stopRefresh();
-        }
-    });
-    this.headerBar.setItems([myItem]);
-
-    var leftItem = new HeaderBarItem({
-        title: "Scan",
-        onPress: function() {
-            Router.go("scan");
-        }
-    });
-    this.headerBar.setLeftItem(leftItem);
-    myDataSet = database.list();
+      var leftItem = new HeaderBarItem({
+          title: "Scan",
+          onPress: function() {
+              Router.go("scan");
+          }
+      });
+      this.headerBar.setLeftItem(leftItem);
+    }
 
     if (System.OS == 'Android') {
 
@@ -173,10 +175,14 @@ function onLoad() {
             text: "Reload",
 
             onTouch: function() {
-                myDataSet = database.list();
+     
+                //myDataSet = database.list();
                 myListView.itemCount = myDataSet.length;
-                myListView.refreshData();
-                myListView.stopRefresh();
+                
+                console.log('data is from ' + JSON.stringify(myDataSet));
+                 
+                 myListView.refreshData();
+                 myListView.stopRefresh();
             }
 
         });
@@ -209,6 +215,8 @@ function onLoad() {
             myListView.stopRefresh();
         }
     });
+    
+    
 
 
     if (System.OS == 'Android') {
@@ -253,9 +261,10 @@ function onLoad() {
 
 
 
-    var myListView = new ListView({
+     myListView = new ListView({
         flexGrow: 1,
         rowHeight: 70,
+        bottom:0,
         itemCount: myDataSet.length,
         verticalScrollBarEnabled:true
     });
@@ -264,6 +273,7 @@ function onLoad() {
     if (System.OS == 'Android') {
 
         myListView.top = 105;
+        myListView.rowHeight= 70;
     }
 
     myListView.onRowCreate = function() {
@@ -325,17 +335,32 @@ function onLoad() {
 
     myListView.onPullRefresh = function() {
         
+        
         myDataSet=database.list();
         myListView.itemCount = myDataSet.length;
         myListView.refreshData();
         myListView.stopRefresh();
+        
+ 
     };
-
+    
     myListView.ios.leftToRightSwipeEnabled = true;
     myListView.ios.rightToLeftSwipeEnabled = true;
 
     page.layout.addChild(myListView);
     page.myListView = myListView;
+    
+    function dataLoad(){
+        
+        myDataSet=database.list();
+        myListView.itemCount = myDataSet.length;
+        myListView.refreshData();
+        myListView.stopRefresh();
+        
+      
+
+    
+    }
 
 
 }

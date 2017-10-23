@@ -71,7 +71,7 @@ function onShow(data) {
 
             var cmd = ("INSERT INTO basic_info (name,serialNo, yearOfMaking, model, location) VALUES( '" + page.name.text + "' , '" + page.serialNo.text + "','" + page.yearOfMaking.text + "', '" + page.model.text + "','" + page.location12.text + "')");
             var result = database.editData(cmd);
-            console.log("result  " + JSON.stringify(result));
+            console.log("result from insert  " + JSON.stringify(result));
             Router.go("list");
         }
     }
